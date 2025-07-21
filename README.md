@@ -13,9 +13,11 @@ A Next.js application that helps developers find the perfect coding projects to 
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 15, React, TypeScript
-- **Styling**: Tailwind CSS
+- **Frontend**: Next.js 15 with Turbopack, React 19, TypeScript
+- **Styling**: Tailwind CSS v4
 - **Build Tool**: Next.js with App Router
+- **Development**: Fast refresh with Turbopack
+- **Utilities**: UUID for unique identifiers
 - **Deployment**: Ready for Vercel/Netlify
 
 ## 📦 Installation
@@ -23,8 +25,8 @@ A Next.js application that helps developers find the perfect coding projects to 
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd new
+git clone https://github.com/kiganyamburu/project-task.git
+cd project-task
 ```
 
 2. Install dependencies:
@@ -33,7 +35,7 @@ cd new
 npm install
 ```
 
-3. Run the development server:
+3. Run the development server (with Turbopack for faster builds):
 
 ```bash
 npm run dev
@@ -48,18 +50,38 @@ src/
 ├── app/
 │   ├── globals.css
 │   ├── layout.tsx
-│   └── page.tsx
-└── components/
-    ├── Navigation.tsx
-    ├── Hero.tsx
-    ├── Features.tsx
-    ├── HowItWorks.tsx
-    ├── RecommendationEngine.tsx
-    ├── TechStack.tsx
-    ├── Roadmap.tsx
-    ├── Branding.tsx
-    ├── CTA.tsx
-    └── Footer.tsx
+│   ├── page.tsx
+│   ├── login/
+│   │   └── page.tsx
+│   ├── signup/
+│   │   └── page.tsx
+│   └── api/
+│       ├── auth/
+│       │   ├── login/
+│       │   │   └── route.ts
+│       │   └── signup/
+│       │       └── route.ts
+│       ├── projects/
+│       │   └── recommendations/
+│       │       └── route.ts
+│       └── test/
+│           └── route.ts
+├── components/
+│   ├── Navigation.tsx
+│   ├── Hero.tsx
+│   ├── Features.tsx
+│   ├── HowItWorks.tsx
+│   ├── RecommendationEngine.tsx
+│   ├── TechStack.tsx
+│   ├── Roadmap.tsx
+│   ├── Branding.tsx
+│   ├── CTA.tsx
+│   └── Footer.tsx
+├── lib/
+│   └── database.ts
+├── types/
+│   └── api.ts
+└── middleware.ts
 ```
 
 ## 🎨 Design System
@@ -71,10 +93,13 @@ src/
 
 ## 📝 Development
 
-- **Type Safety**: Full TypeScript support
+- **Type Safety**: Full TypeScript support with strict types
 - **Code Quality**: ESLint configuration included
 - **Responsive**: Mobile-first design approach
 - **Accessibility**: Semantic HTML and proper contrast ratios
+- **API Routes**: Built-in authentication and recommendation endpoints
+- **Database**: Database abstraction layer ready for integration
+- **Fast Development**: Turbopack for lightning-fast hot reloads
 
 ## 🚀 Deployment
 
@@ -86,7 +111,7 @@ The project is ready to deploy on:
 
 ## 📋 Scripts
 
-- `npm run dev` - Start development server
+- `npm run dev` - Start development server with Turbopack
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
