@@ -100,6 +100,11 @@ src/
 - **API Routes**: Built-in authentication and recommendation endpoints
 - **Database**: Database abstraction layer ready for integration
 - **Fast Development**: Turbopack for lightning-fast hot reloads
+- **Hydration Safety**: Built-in protection against browser extension conflicts
+
+### Common Issues
+
+**Hydration Mismatch Error**: If you encounter hydration warnings due to browser extensions (like Grammarly), the layout includes `suppressHydrationWarning` to handle these safely. For custom components that need client-side only rendering, use the `NoSSR` component or `useIsClient` hook provided in the project.
 
 ## 🚀 Deployment
 
