@@ -1,3 +1,7 @@
+<p align="center">
+	<img src="public/project.png" alt="image of the project="180" />
+</p>
+
 # CodePath - Developer Project Recommendation Platform
 
 A Next.js application that helps developers find the perfect coding projects to advance their careers through AI-powered recommendations.
