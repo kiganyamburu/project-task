@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="public/project.png" alt="image of the project="180" />
+	<img src="public/project.png" alt="Landing page for a developer project recommendation platform featuring bold white text that reads Find Your Perfect Coding Project, a short description about AI-powered project matching, two prominent buttons labeled Get Started Free and Watch Demo, and three statistics: 50K plus curated projects, 98 percent match accuracy, and 12 times faster learning. The background is a vibrant purple to blue gradient, creating an energetic and inviting atmosphere." width="180" />
 </p>
 
 # CodePath - Developer Project Recommendation Platform
