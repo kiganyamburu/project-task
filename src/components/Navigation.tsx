@@ -1,6 +1,47 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useIsClient } from "@/lib/hooks";
+
+interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 
 export default function Navigation() {
+  const [user, setUser] = useState<User | null>(null);
+  const isClient = useIsClient();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isClient) {
+      // Check for user in localStorage
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          const userData = JSON.parse(userStr);
+          setUser(userData);
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
+      }
+    }
+  }, [isClient]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("adminUser");
+    localStorage.removeItem("adminToken");
+    setUser(null);
+    router.push("/");
+    router.refresh();
+  };
+
   return (
     <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,18 +82,36 @@ export default function Navigation() {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-            <Link
-              href="/login"
-              className="text-gray-500 hover:text-gray-700 text-sm font-medium"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300"
-            >
-              Sign Up
-            </Link>
+            {isClient && user ? (
+              <>
+                <div className="flex items-center space-x-3">
+                  <span className="text-gray-700 text-sm font-medium">
+                    {user.firstName} {user.lastName}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

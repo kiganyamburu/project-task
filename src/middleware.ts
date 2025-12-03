@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimiter';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Handle CORS for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    const response = NextResponse.next();
+    // Check rate limiting first (before processing the request)
+    const rateLimitResult = await checkRateLimit(request);
+    
+    // If rate limited, return the error response (with CORS headers added)
+    if (!rateLimitResult.allowed) {
+      const errorResponse = rateLimitResult.response;
+      
+      // Add CORS headers to rate limit error response
+      errorResponse.headers.set('Access-Control-Allow-Origin', '*');
+      errorResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      errorResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      
+      return errorResponse;
+    }
+    
+    // Rate limit passed, continue with CORS handling
+    const response = rateLimitResult.response;
     
     // Add CORS headers
     response.headers.set('Access-Control-Allow-Origin', '*');

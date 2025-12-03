@@ -107,6 +107,15 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
 
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text.substring(0, 200));
+        setError(`Server error (${response.status}). Please try again.`);
+        return;
+      }
+
       const result = await response.json();
 
       if (result.success) {
@@ -121,7 +130,11 @@ export default function SignUp() {
       }
     } catch (err) {
       console.error('Signup error:', err);
-      setError('Network error. Please try again.');
+      if (err instanceof SyntaxError) {
+        setError('Server returned invalid response. Please try again.');
+      } else {
+        setError('Network error. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

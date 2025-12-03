@@ -1,27 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/database';
-import { SignupRequest, ApiResponse, AuthResponse } from '@/types/api';
+import { db, hashPassword } from '@/lib/firestoreDb';
+import { ApiResponse, AuthResponse } from '@/types/api';
+import { formatFirestoreError, getFirestoreErrorInfo } from '@/lib/firestoreErrors';
+import { validateRequestBody, signupSchema, SignupRequest } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: SignupRequest = await request.json();
+    // Validate request body using Zod schema
+    const validationResult = await validateRequestBody<SignupRequest>(request, signupSchema);
     
-    // Validate required fields
-    const { firstName, lastName, email, password, confirmPassword, experience, goals, timeCommitment } = body;
-    
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      return NextResponse.json({
-        success: false,
-        error: 'Missing required fields'
-      } as ApiResponse, { status: 400 });
+    if (!validationResult.success) {
+      return validationResult.response;
     }
 
-    if (password !== confirmPassword) {
-      return NextResponse.json({
-        success: false,
-        error: 'Passwords do not match'
-      } as ApiResponse, { status: 400 });
-    }
+    const { firstName, lastName, email, password, githubUsername, experience, goals, timeCommitment } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await db.users.findByEmail(email);
@@ -32,13 +24,16 @@ export async function POST(request: NextRequest) {
       } as ApiResponse, { status: 409 });
     }
 
+    // Hash password before storing
+    const hashedPassword = await hashPassword(password);
+
     // Create new user
     const user = await db.users.create({
       firstName,
       lastName,
       email,
-      password, // In production, this should be hashed
-      githubUsername: body.githubUsername,
+      password: hashedPassword,
+      githubUsername,
       experience,
       goals,
       timeCommitment
@@ -60,11 +55,15 @@ export async function POST(request: NextRequest) {
       }
     } as ApiResponse<AuthResponse>);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Signup error:', error);
+    
+    // Check if it's a Firestore error
+    const errorInfo = getFirestoreErrorInfo(error);
+    
     return NextResponse.json({
       success: false,
-      error: 'Internal server error'
-    } as ApiResponse, { status: 500 });
+      error: errorInfo.userMessage || 'Internal server error'
+    } as ApiResponse, { status: errorInfo.statusCode || 500 });
   }
 }

@@ -6,16 +6,21 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check-firebase": "node scripts/check-firebase-credentials.js"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/uuid": "^10.0.0",
+    "bcryptjs": "^3.0.3",
     "firebase": "^12.2.1",
     "firebase-admin": "^13.5.0",
     "next": "15.4.2",
+    "rate-limiter-flexible": "^8.3.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

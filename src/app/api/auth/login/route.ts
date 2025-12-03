@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/database';
-import { LoginRequest, ApiResponse, AuthResponse } from '@/types/api';
+import { db, verifyPassword } from '@/lib/firestoreDb';
+import { ApiResponse, AuthResponse } from '@/types/api';
+import { formatFirestoreError, getFirestoreErrorInfo } from '@/lib/firestoreErrors';
+import { validateRequestBody, loginSchema, LoginRequest } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: LoginRequest = await request.json();
+    // Validate request body using Zod schema
+    const validationResult = await validateRequestBody<LoginRequest>(request, loginSchema);
     
-    // Validate required fields
-    const { email, password } = body;
-    
-    if (!email || !password) {
-      return NextResponse.json({
-        success: false,
-        error: 'Email and password are required'
-      } as ApiResponse, { status: 400 });
+    if (!validationResult.success) {
+      return validationResult.response;
     }
+
+    const { email, password } = validationResult.data;
 
     // Find user by email
     const user = await db.users.findByEmail(email);
@@ -25,8 +24,9 @@ export async function POST(request: NextRequest) {
       } as ApiResponse, { status: 401 });
     }
 
-    // Verify password (in production, this should use proper password hashing)
-    if (user.password !== password) {
+    // Verify password using bcrypt
+    const isPasswordValid = await verifyPassword(password, user.password);
+    if (!isPasswordValid) {
       return NextResponse.json({
         success: false,
         error: 'Invalid email or password'
@@ -49,11 +49,15 @@ export async function POST(request: NextRequest) {
       }
     } as ApiResponse<AuthResponse>);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Login error:', error);
+    
+    // Check if it's a Firestore error
+    const errorInfo = getFirestoreErrorInfo(error);
+    
     return NextResponse.json({
       success: false,
-      error: 'Internal server error'
-    } as ApiResponse, { status: 500 });
+      error: errorInfo.userMessage || 'Internal server error'
+    } as ApiResponse, { status: errorInfo.statusCode || 500 });
   }
 }

@@ -1,7 +1,13 @@
+interface GeminiRequestBody {
+  model: string;
+  max_tokens: number;
+  prompt: string;
+}
+
 export async function callGemini(
   prompt: string,
   options?: { maxTokens?: number }
-) {
+): Promise<string | null> {
   const url = process.env.GEMINI_API_URL;
   const key = process.env.GEMINI_API_KEY;
 
@@ -10,7 +16,7 @@ export async function callGemini(
     return null;
   }
 
-  const body: any = {
+  const body: GeminiRequestBody = {
     // We keep this generic so the project owner can point to an OpenAI-compatible
     // proxy or Google's Vertex AI endpoint. Minimal defaults are provided.
     model: process.env.GEMINI_MODEL || "gemini",
